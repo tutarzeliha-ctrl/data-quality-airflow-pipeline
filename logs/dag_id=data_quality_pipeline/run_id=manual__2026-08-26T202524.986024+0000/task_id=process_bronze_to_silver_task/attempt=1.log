@@ -1,0 +1,52 @@
+[2026-08-26T20:25:32.380+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-08-26T20:25:32.397+0000] {taskinstance.py:2603} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: data_quality_pipeline.process_bronze_to_silver_task manual__2026-08-26T20:25:24.986024+00:00 [queued]>
+[2026-08-26T20:25:32.408+0000] {taskinstance.py:2603} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: data_quality_pipeline.process_bronze_to_silver_task manual__2026-08-26T20:25:24.986024+00:00 [queued]>
+[2026-08-26T20:25:32.412+0000] {taskinstance.py:2856} INFO - Starting attempt 1 of 2
+[2026-08-26T20:25:32.438+0000] {taskinstance.py:2879} INFO - Executing <Task(PythonOperator): process_bronze_to_silver_task> on 2026-08-26 20:25:24.986024+00:00
+[2026-08-26T20:25:32.446+0000] {standard_task_runner.py:72} INFO - Started process 169 to run task
+[2026-08-26T20:25:32.456+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'data_quality_pipeline', 'process_bronze_to_silver_task', 'manual__2026-08-26T20:25:24.986024+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/data_quality_pipeline_dag.py', '--cfg-path', '/tmp/tmpnbxgju1a']
+[2026-08-26T20:25:32.462+0000] {standard_task_runner.py:105} INFO - Job 3: Subtask process_bronze_to_silver_task
+[2026-08-26T20:25:32.535+0000] {task_command.py:467} INFO - Running <TaskInstance: data_quality_pipeline.process_bronze_to_silver_task manual__2026-08-26T20:25:24.986024+00:00 [running]> on host 12ed75a11a95
+[2026-08-26T20:25:32.693+0000] {taskinstance.py:3122} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='zeliha' AIRFLOW_CTX_DAG_ID='data_quality_pipeline' AIRFLOW_CTX_TASK_ID='process_bronze_to_silver_task' AIRFLOW_CTX_EXECUTION_DATE='2026-08-26T20:25:24.986024+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-08-26T20:25:24.986024+00:00'
+[2026-08-26T20:25:32.699+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-08-26T20:25:33.112+0000] {logging_mixin.py:190} INFO - --- Raw Data Loaded Successfully ---
+[2026-08-26T20:25:33.115+0000] {logging_mixin.py:190} INFO - shape: (10, 6)
+┌────────────────┬─────────────┬────────────┬────────┬──────────────────┬────────────────┐
+│ transaction_id ┆ customer_id ┆ product_id ┆ amount ┆ transaction_date ┆ store_location │
+│ ---            ┆ ---         ┆ ---        ┆ ---    ┆ ---              ┆ ---            │
+│ i64            ┆ str         ┆ str        ┆ f64    ┆ str              ┆ str            │
+╞════════════════╪═════════════╪════════════╪════════╪══════════════════╪════════════════╡
+│ 1001           ┆ C101        ┆ P501       ┆ 250.5  ┆ 2026-08-24       ┆ Istanbul       │
+│ 1002           ┆ C102        ┆ P502       ┆ 120.0  ┆ 2026-08-24       ┆ Ankara         │
+│ 1003           ┆ C101        ┆ P503       ┆ null   ┆ 2026-08-24       ┆ Izmir          │
+│ 1004           ┆ C103        ┆ P501       ┆ 450.0  ┆ 2026-08-25       ┆ Istanbul       │
+│ 1005           ┆ C104        ┆ P504       ┆ 89.9   ┆ 2026-08-25       ┆ Antalya        │
+│ 1006           ┆ C102        ┆ P501       ┆ 310.0  ┆ 2026-08-25       ┆ Ankara         │
+│ 1007           ┆ C105        ┆ P505       ┆ 150.0  ┆ 2026-08-26       ┆ Bursa          │
+│ 1008           ┆ C101        ┆ P502       ┆ null   ┆ 2026-08-26       ┆ Istanbul       │
+│ 1009           ┆ C106        ┆ P503       ┆ 550.0  ┆ 2026-08-26       ┆ Izmir          │
+│ 1010           ┆ C103        ┆ P505       ┆ 210.0  ┆ 2026-08-26       ┆ Istanbul       │
+└────────────────┴─────────────┴────────────┴────────┴──────────────────┴────────────────┘
+[2026-08-26T20:25:33.263+0000] {logging_mixin.py:190} INFO - --- Cleaned (Silver) Data ---
+[2026-08-26T20:25:33.266+0000] {logging_mixin.py:190} INFO - shape: (8, 6)
+┌────────────────┬─────────────┬────────────┬────────┬──────────────────┬────────────────┐
+│ transaction_id ┆ customer_id ┆ product_id ┆ amount ┆ transaction_date ┆ store_location │
+│ ---            ┆ ---         ┆ ---        ┆ ---    ┆ ---              ┆ ---            │
+│ i64            ┆ str         ┆ str        ┆ f64    ┆ str              ┆ str            │
+╞════════════════╪═════════════╪════════════╪════════╪══════════════════╪════════════════╡
+│ 1001           ┆ C101        ┆ P501       ┆ 250.5  ┆ 2026-08-24       ┆ Istanbul       │
+│ 1002           ┆ C102        ┆ P502       ┆ 120.0  ┆ 2026-08-24       ┆ Ankara         │
+│ 1004           ┆ C103        ┆ P501       ┆ 450.0  ┆ 2026-08-25       ┆ Istanbul       │
+│ 1005           ┆ C104        ┆ P504       ┆ 89.9   ┆ 2026-08-25       ┆ Antalya        │
+│ 1006           ┆ C102        ┆ P501       ┆ 310.0  ┆ 2026-08-25       ┆ Ankara         │
+│ 1007           ┆ C105        ┆ P505       ┆ 150.0  ┆ 2026-08-26       ┆ Bursa          │
+│ 1009           ┆ C106        ┆ P503       ┆ 550.0  ┆ 2026-08-26       ┆ Izmir          │
+│ 1010           ┆ C103        ┆ P505       ┆ 210.0  ┆ 2026-08-26       ┆ Istanbul       │
+└────────────────┴─────────────┴────────────┴────────┴──────────────────┴────────────────┘
+[2026-08-26T20:25:33.305+0000] {logging_mixin.py:190} INFO - Data successfully written to Silver layer: /opt/airflow/data/silver/clean_sales.parquet
+[2026-08-26T20:25:33.307+0000] {python.py:240} INFO - Done. Returned value was: None
+[2026-08-26T20:25:33.314+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-08-26T20:25:33.317+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=data_quality_pipeline, task_id=process_bronze_to_silver_task, run_id=manual__2026-08-26T20:25:24.986024+00:00, execution_date=20260826T202524, start_date=20260826T202532, end_date=20260826T202533
+[2026-08-26T20:25:33.352+0000] {local_task_job_runner.py:261} INFO - Task exited with return code 0
+[2026-08-26T20:25:33.362+0000] {taskinstance.py:3891} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-08-26T20:25:33.365+0000] {local_task_job_runner.py:240} INFO - ::endgroup::

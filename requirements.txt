@@ -1,0 +1,5 @@
+apache-airflow==2.10.0
+polars
+duckdb
+great-expectations
+apache-airflow-providers-openlineage>=1.8.0
