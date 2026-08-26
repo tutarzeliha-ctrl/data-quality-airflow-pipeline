@@ -1,4 +1,25 @@
 # Production-Grade Medallion Data Pipeline 🚀
+graph LR
+    subgraph "Source"
+        A[raw_sales.csv <br/> 1 Million Rows]
+    end
+
+    subgraph "Airflow Pipeline"
+        B(Bronze Layer) -->|Polars Cleaning| C(Silver Layer)
+        C -->|Data Quality Gates| D{Quality Check}
+        D -->|Passed| E(Gold Layer)
+        D -->|Failed| F[Error Alert]
+    end
+
+    subgraph "Serving"
+        E -->|DuckDB SQL| G[store_performance.csv]
+        G -->|Visuals| H[Portfolio Presentation]
+    end
+
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style E fill:#bfb,stroke:#333,stroke-width:2px
+    style D fill:#f96,stroke:#333,stroke-width:4px
 
 An end-to-end, high-performance Data Engineering pipeline built with **Apache Airflow**, **Polars**, and **DuckDB**, implementing the **Medallion Architecture (Bronze -> Silver -> Gold)** with automated **Data Quality Gates**.
 
