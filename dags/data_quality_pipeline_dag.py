@@ -4,12 +4,42 @@ from airflow.operators.python import PythonOperator
 import polars as pl
 import duckdb
 import os
+import requests
+
+# Slack Webhook URL configuration (can be fetched from environment variables)
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "YOUR_SLACK_WEBHOOK_URL_HERE")
+
+def send_slack_alert(context):
+    """Sends a failure alert notification to Slack when a task fails."""
+    if "YOUR_SLACK" in SLACK_WEBHOOK_URL:
+        return # Skip if webhook is not configured
+    
+    task_instance = context.get('task_instance')
+    dag_id = task_instance.dag_id
+    task_id = task_instance.task_id
+    execution_date = context.get('execution_date')
+    log_url = task_instance.log_url
+
+    error_message = (
+        f"🚨 *Airflow Task Failed!*\n"
+        f"*DAG:* `{dag_id}`\n"
+        f"*Task:* `{task_id}`\n"
+        f"*Execution Date:* `{execution_date}`\n"
+        f"*Logs:* {log_url}"
+    )
+    
+    payload = {"text": error_message}
+    try:
+        requests.post(SLACK_WEBHOOK_URL, json=payload, timeout=5)
+    except Exception as e:
+        print(f"Failed to send Slack alert: {e}")
 
 default_args = {
     'owner': 'zeliha',
     'depends_on_past': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
+    'on_failure_callback': send_slack_alert, # Global failure callback for all tasks
 }
 
 def process_bronze_to_silver():
@@ -79,11 +109,11 @@ def process_silver_to_gold():
 with DAG(
     'data_quality_pipeline',
     default_args=default_args,
-    description='Production Medallion Pipeline with Data Quality Gates',
+    description='Production Medallion Pipeline with Data Quality Gates & Slack Alerting',
     schedule_interval=timedelta(days=1),
     start_date=datetime(2026, 1, 1),
     catchup=False,
-    tags=['medallion', 'polars', 'duckdb', 'data-quality'],
+    tags=['medallion', 'polars', 'duckdb', 'data-quality', 'observability'],
 ) as dag:
 
     task_silver = PythonOperator(

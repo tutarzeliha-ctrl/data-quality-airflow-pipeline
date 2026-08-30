@@ -1,0 +1,16 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Airflow & Logs
+logs/
+airflow/logs/
+*.sqlite
+*.duckdb
+
+# OS Files
+.DS_Store
+Thumbs.db
