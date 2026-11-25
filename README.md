@@ -1,49 +1,56 @@
-# 🚀 Production-Grade Medallion Data Pipeline with Airflow, Polars, & DuckDB
+# Medallion Pipeline with Airflow, Polars and DuckDB
 
-[![GitHub license](https://img.shields.io/github/license/tutarzeliha-ctrl/data-quality-airflow-pipeline)](https://github.com/tutarzeliha-ctrl/data-quality-airflow-pipeline/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/tutarzeliha-ctrl/data-quality-airflow-pipeline?style=social)](https://github.com/tutarzeliha-ctrl/data-quality-airflow-pipeline/stargazers)
+A local Airflow pipeline that moves synthetic sales data through bronze, silver
+and gold layers, with assertion-based data quality checks between the layers.
 
-This project delivers a **production-grade** data pipeline designed to stand out in data engineering portfolios and interviews. Moving beyond generic Kaggle-style scripts, it combines modern technologies, data quality automation, and a robust **Medallion Architecture (Bronze -> Silver -> Gold)**.
+## What it does
 
----
+1. **Bronze:** `generate_data.py` writes 1 million synthetic sales rows to
+   `data/raw_sales.csv`. About 5% of the `amount` values are left empty on purpose.
+2. **Silver:** Polars reads the CSV, drops rows with an empty `amount` and writes
+   `data/silver/clean_sales.parquet`.
+3. **Quality checks:** the DAG stops if the silver data is empty, still has null
+   amounts, or has an amount of zero or less.
+4. **Gold:** DuckDB aggregates the silver Parquet file into
+   `data/gold/store_performance.csv` (total sales, transactions and average order
+   value per store).
 
-## 🏗️ Executive Summary
+An optional Slack callback sends a message when a task fails, if
+`SLACK_WEBHOOK_URL` is set.
 
-> **Project Goal:** Process 1 million rows of transactional data with high performance, catch data quality anomalies early, and deliver reliable analytical reports for business units.
+## Tech stack
 
-* **Automated Orchestration:** Fully managed via **Apache Airflow**.
-* **High-Performance Processing:** Built with **Polars** (Rust-backed) for up to 10x faster data transformation compared to Pandas.
-* **Data Quality Gates:** Automated assertion rules to prevent dirty or invalid data from reaching downstream analytics.
-* **SQL-First Analytics:** Powered by **DuckDB** for lightning-fast SQL querying over processed Parquet files.
+| Part | Tool |
+| :--- | :--- |
+| Orchestration | Apache Airflow (Docker Compose) |
+| Transformation | Polars |
+| Storage | CSV (bronze), Parquet (silver), CSV (gold) |
+| Analytical query | DuckDB |
+| Quality checks | Python assertions inside an Airflow task |
 
----
+The repository also contains a small dbt project (`transform_project/`) and a
+second DAG (`dags/dbt_pipeline_dag.py`) that I used to try dbt with DuckDB.
 
-## 🛠️ Production-Grade Tech Stack
+## Run it locally
 
-| Component | Tool Selection | Production Benefit |
-| :--- | :--- | :--- |
-| **Orchestration** | **Apache Airflow** | Automated retries, DAG visualization, and robust scheduling. |
-| **Transformation** | **Polars & DuckDB** | Blazing fast speed, memory efficiency, and native SQL capabilities. |
-| **Storage Format** | **Apache Parquet** | Columnar compression and highly efficient analytical scans. |
-| **Quality Control** | **Custom Assertions** | Enforced data contracts and automated task failure on data errors. |
-
----
-
-## ⚙️ Quick Start (Local Docker Setup)
-
-To run this project locally, execute the following commands in your terminal:
-
-1. Clone the repository:
 ```bash
-git clone [https://github.com/tutarzeliha-ctrl/data-quality-airflow-pipeline.git](https://github.com/tutarzeliha-ctrl/data-quality-airflow-pipeline.git)
+git clone https://github.com/tutarzeliha-ctrl/data-quality-airflow-pipeline.git
 cd data-quality-airflow-pipeline
-
-Spin up Airflow using Docker Compose:
-
-Bash
-docker compose up --build -d
-Generate 1 Million rows of synthetic test data:
-
-Bash
+mkdir data
 python generate_data.py
-Open the Airflow UI at http://localhost:8081 and trigger the DAG!
+docker compose up --build -d
+```
+
+Then open the Airflow UI at http://localhost:8081 and trigger the
+`data_quality_pipeline` DAG.
+
+## Limitations
+
+- Synthetic data only.
+- The null-amount check runs after the silver step has already removed nulls,
+  so it can only fail if that step changes. A stronger version would count and
+  report the removed rows.
+- Performance was not benchmarked; there is no comparison with Pandas.
+- The Slack alert has not been tested against a live workspace.
+- Generated data and Airflow logs are not stored in the repository; create them
+  with the steps above.
